@@ -70,7 +70,7 @@ AdaptSwitch = 2;
 % 1 - MFPSM Weak
 % 2 - MFPSM Moderate
 % 3 - MFPSM Severe
-ScintScenario = 3;
+ScintScenario = 2;
     if ScintScenario == 1
         load('S4_0p35_tau_2p0_200_L1_L2_L5_300s.mat');
     elseif ScintScenario == 2
@@ -128,7 +128,7 @@ run('EKF_VAR_Specific_Config.m');
 % *** Lp=1 to observe L1 states; Lp=2 to observe L5 states;
 % ---Topology #1.3 and #2.3:
 % *** Lp=1 to observe L1 states; Lp=2 to observe L2 states; and Lp=3 to observe L5 states
-Lp = 1;
+Lp = 3;
 
 % Display the Total RMSE of each parameter of our interest
 disp(['LOS phase RMSE EKF: ', num2str(sqrt(mean(ED_EKF(:,Lp).^2,1)))]);

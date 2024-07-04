@@ -50,6 +50,36 @@ for k = 1:Samples
         Pkk1 = Fk*Pk1k1*Fk' + Qk;
     end
 
+    % There is a trade-off in choosing higher thresholds for the amplitude
+    % fades. When gamma is higher than 0.01, the Total carrier phase RMSE
+    % closer to the KF, but the LOS phase and Scint Phase are worse. When
+    % it is below 0.01, it gets
+    
+    % Amplitude Constraints
+    gamma = 0.1;
+    if TopologySelector == 1
+        if xkk1(L+M-1+1) <= gamma
+            xkk1(L+M-1+1) = gamma;
+        end
+    elseif TopologySelector == 2
+        if xkk1(L+M-1+1) <= gamma
+            xkk1(L+M-1+1) = gamma;
+        end
+        if xkk1(L+M-1+2) <= gamma
+            xkk1(L+M-1+2) = gamma;
+        end
+    elseif TopologySelector == 3
+        if xkk1(L+M-1+1) <= gamma
+            xkk1(L+M-1+1) = gamma;
+        end
+        if xkk1(L+M-1+2) <= gamma
+            xkk1(L+M-1+2) = gamma;
+        end
+        if xkk1(L+M-1+3) <= gamma
+            xkk1(L+M-1+3) = gamma;
+        end
+    end
+    
     xkk1_TS(k,:) = xkk1';
     Pkk1_TS(:,:,k) = Pkk1;
     %% Atualization
@@ -140,10 +170,9 @@ for k = 1:Samples
             CN0_L1_hat = CN0L1*abs(yk(1))^2;
             CN0_L2_hat = CN0L2*abs(yk(2))^2;
             CN0_L5_hat = CN0L5*abs(yk(3))^2;
-            kp =  1;
-            sigma2Measure_valueL1 = kp*(1/(2*CN0_L1_hat*T_I))*(1+(1/(2*CN0_L1_hat*T_I)));
-            sigma2Measure_valueL2 = kp*(1/(2*CN0_L2_hat*T_I))*(1+(1/(2*CN0_L2_hat*T_I)));
-            sigma2Measure_valueL5 = kp*(1/(2*CN0_L5_hat*T_I))*(1+(1/(2*CN0_L5_hat*T_I)));
+            sigma2Measure_valueL1 = (1/(2*CN0_L1_hat*T_I))*(1+(1/(2*CN0_L1_hat*T_I)));
+            sigma2Measure_valueL2 = (1/(2*CN0_L2_hat*T_I))*(1+(1/(2*CN0_L2_hat*T_I)));
+            sigma2Measure_valueL5 = (1/(2*CN0_L5_hat*T_I))*(1+(1/(2*CN0_L5_hat*T_I)));
             Rk_adapt = diag([sigma2Measure_valueL1/2,sigma2Measure_valueL1/2,sigma2Measure_valueL2/2,sigma2Measure_valueL2/2,sigma2Measure_valueL5/2,sigma2Measure_valueL5/2]);
         end
     end
@@ -152,39 +181,59 @@ for k = 1:Samples
     xkk = xkk1 + Kk*(yk_formatted(k,:)' - ykk1);
     Pkk = Pkk1 - Kk*JHk*Pkk1;
     
-    if TopologySelector == 1
-        D = [zeros(1,L+M-1),zeros(1,NumSeries*P)];
-        d = zeros(1,1);
-        if xkk(L+M-1 + 1) <= 0
-            D(1,L+M-1 + 1) = 1;
-        end
-    elseif TopologySelector == 2
-        D = [zeros(1,L+M-1),zeros(1,NumSeries*P);
-             zeros(1,L+M-1),zeros(1,NumSeries*P)];
-        d = zeros(2,1);
-        if xkk(L+M-1 + 1) <= 0
-            D(1,L+M-1 + 1) = 1;
-        end
-        if xkk(L+M-1 + 2) <= 0
-            D(1,L+M-1 + 2) = 1;
-        end
-    elseif TopologySelector == 3
-        D = [zeros(1,L+M-1),zeros(1,NumSeries*P);
-             zeros(1,L+M-1),zeros(1,NumSeries*P);
-             zeros(1,L+M-1),zeros(1,NumSeries*P)];
-        d = zeros(3,1);
-        if xkk(L+M-1 + 1) <= 0
-            D(1,L+M-1 + 1) = 1;
-        end
-        if xkk(L+M-1 + 2) <= 0
-            D(1,L+M-1 + 2) = 1;
-        end
-        if xkk(L+M-1 + 3) <= 0
-            D(1,L+M-1 + 3) = 1;
-        end
-    end
-    
-    xkk = xkk - Pkk*D'*((D*Pkk*D')\eye(TopologySelector))*(D*xkk-d);
+%     gamma = 0.1;
+%     if TopologySelector == 1
+%         D = [zeros(1,L+M-1),zeros(1,NumSeries*P)];
+%         d = ones(1,1)*gamma;
+%         if xkk(L+M-1 + 1) <= 0
+%             D(1,L+M-1 + 1) = 1;
+%         else
+%             D(1,L+M-1 + 1) = 0;
+%         end
+%     elseif TopologySelector == 2
+%         D = [zeros(1,L+M-1),zeros(1,NumSeries*P);
+%              zeros(1,L+M-1),zeros(1,NumSeries*P)];
+%         d = ones(2,1)*gamma;
+%         
+%         if xkk(L+M-1 + 1) <= 0
+%             D(1,L+M-1 + 1) = 1;
+%         else
+%             D(1,L+M-1 + 1) = 0;
+%         end
+%         
+%         if xkk(L+M-1 + 2) <= 0
+%             D(1,L+M-1 + 2) = 1;
+%         else
+%             D(1,L+M-1 + 2) = 0;
+%         end
+%         
+%     elseif TopologySelector == 3
+%         D = [zeros(1,L+M-1),zeros(1,NumSeries*P);
+%              zeros(1,L+M-1),zeros(1,NumSeries*P);
+%              zeros(1,L+M-1),zeros(1,NumSeries*P)];
+%         d = ones(3,1)*gamma;
+%         if xkk(L+M-1 + 1) <= 0
+%             D(1,L+M-1 + 1) = 1;
+%         else
+%             D(1,L+M-1 + 1) = 0;
+%         end
+%         
+%         if xkk(L+M-1 + 2) <= 0
+%             D(1,L+M-1 + 2) = 1;
+%         else
+%             D(1,L+M-1 + 2) = 0;
+%         end
+%         
+%         if xkk(L+M-1 + 3) <= 0
+%             D(1,L+M-1 + 3) = 1;
+%         else
+%             D(1,L+M-1 + 3) = 0;
+%         end
+%     end
+%     
+%     if sum(sum(D,1),2) > 0
+%         xkk = xkk - Pkk*D'*((D*Pkk*D' + (1e-9)*eye(TopologySelector))\eye(TopologySelector))*(D*xkk-d);
+%     end
 end
 
 end
