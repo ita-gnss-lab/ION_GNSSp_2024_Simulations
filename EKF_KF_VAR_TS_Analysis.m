@@ -70,7 +70,7 @@ AdaptSwitch = 2;
 % 1 - MFPSM Weak
 % 2 - MFPSM Moderate
 % 3 - MFPSM Severe
-ScintScenario = 2;
+ScintScenario = 1;
     if ScintScenario == 1
         load('S4_0p35_tau_2p0_200_L1_L2_L5_300s.mat');
     elseif ScintScenario == 2
@@ -182,6 +182,8 @@ ylabel('$$\hat{\phi}_{I,L_1}$$ [rad]', 'Interpreter', 'latex');
 legend({'$$\hat{\rho}_{I,L_1,EKF-VAR}$$','$$\rho_{I,L_1,True}$$'}, 'Location', 'best', 'Interpreter', 'latex');
 set(gca, 'FontSize', 12);
 title('$$\hat{\phi}_{I,L_1}$$ - EKF-VAR and KF-VAR', 'Interpreter', 'latex');
+
+
 
 % % Display the Total RMSE of each parameter of our interest
 % disp(['LOS phase RMSE EKF: ', num2str(sqrt(mean(ED_EKF(:,Lp).^2,1)))]);
