@@ -311,6 +311,6 @@ if ScintScenario == 1
 elseif ScintScenario == 2
     print([cd,'\Results\Results_Moderate'], '-dpdf', '-r300');
 elseif ScintScenario == 3
-    print([cd,'\Results\Results_Severe'], '-dpdf', '-r300');
+    print([cd,'\Results\Results_Severe'], '-dpdf  ', '-r300');
 end
 
